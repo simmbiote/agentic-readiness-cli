@@ -23,7 +23,11 @@ function gradeColor(grade: string): (input: string | number) => string {
   return pc.red;
 }
 
-export function renderReport(result: ScoringResult): string {
+export interface RenderReportOptions {
+  summary?: boolean;
+}
+
+export function renderReport(result: ScoringResult, options: RenderReportOptions = {}): string {
   const lines: string[] = [];
 
   const { earned, max, percentage, grade } = result.overall;
@@ -60,10 +64,14 @@ export function renderReport(result: ScoringResult): string {
     lines.push(
       `${CATEGORY_LABELS[category.category]}: ${categoryColor(`${category.earned}/${category.max}`)} (${categoryColor(`${category.percentage.toFixed(1)}%`)})`,
     );
-    for (const metric of category.metrics) {
-      const mark = (metric.passed ? pc.green : pc.red)(`[${metric.passed ? 'x' : ' '}]`);
-      const providerTag = metric.provider ? ` [${metric.provider}]` : '';
-      lines.push(`  ${mark} ${metric.description} (${metric.earned}/${metric.points})${providerTag}`);
+    if (!options.summary) {
+      for (const metric of category.metrics) {
+        const mark = (metric.passed ? pc.green : pc.red)(`[${metric.passed ? 'x' : ' '}]`);
+        const providerTag = metric.provider ? ` [${metric.provider}]` : '';
+        lines.push(
+          `  ${mark} ${metric.description} (${metric.earned}/${metric.points})${providerTag}`,
+        );
+      }
     }
     lines.push('');
   }

@@ -19,17 +19,20 @@ npm run build
 ## Run
 
 ```bash
-npx agentlint [path]        # human-readable report, defaults to the current directory
-npx agentlint [path] --json # structured JSON output
+npx agentlint scan [path]            # human-readable report, defaults to the current directory
+npx agentlint scan [path] --json     # structured JSON output
+npx agentlint scan [path] --summary  # condensed report: overall, top improvements, providers, category totals — no per-metric detail
 ```
+
+`--summary` can be combined with `--json` to trim the JSON output the same way: each entry in `categories` omits its `metrics` array.
 
 During development, run directly against source without building:
 
 ```bash
-npm run dev -- [path]
+npm run dev -- scan [path]
 ```
 
-> **Known issue:** `npx agentlint [path]` currently exits silently with no output.
+> **Known issue:** `npx agentlint scan [path]` currently exits silently with no output.
 > `dist/cli.js`'s main-module check (`import.meta.url === new URL(process.argv[1], 'file:').href`)
 > fails when the CLI is invoked through the `node_modules/.bin/agentlint` symlink that `npx`
 > uses, because `import.meta.url` resolves through the symlink to a different path than
@@ -37,8 +40,8 @@ npm run dev -- [path]
 >
 > ```bash
 > npm run build
-> node dist/cli.js [path]        # e.g. node dist/cli.js . to score this repo
-> node dist/cli.js [path] --json
+> node dist/cli.js scan [path]        # e.g. node dist/cli.js scan . to score this repo
+> node dist/cli.js scan [path] --json
 > ```
 
 ## Test

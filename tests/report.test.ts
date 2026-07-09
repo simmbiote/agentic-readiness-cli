@@ -80,4 +80,22 @@ describe('renderReport', () => {
 
     expect(output).not.toMatch(/\x1b\[/);
   });
+
+  it('omits per-metric lines but keeps every other section when summary is true', () => {
+    const output = renderReport(buildResult(), { summary: true });
+
+    expect(output).toContain('Overall:');
+    expect(output).toContain('Top Improvements:');
+    expect(output).toContain('Detected providers:');
+    expect(output).toContain('Documentation: 25/50 (50.0%)');
+    expect(output).not.toContain('README exists');
+    expect(output).not.toContain('CONTRIBUTING.md exists (0/25)');
+  });
+
+  it('renders the full per-metric breakdown when summary is unset (regression check)', () => {
+    const output = renderReport(buildResult());
+
+    expect(output).toContain('README exists');
+    expect(output).toContain('CONTRIBUTING.md exists (0/25)');
+  });
 });

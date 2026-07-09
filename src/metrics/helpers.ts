@@ -372,6 +372,12 @@ export function adrDir(ctx: ScanContext): string | null {
   return ctx.hasPath('docs/adr') ? 'docs/adr' : null;
 }
 
+export function specsDir(ctx: ScanContext): string | null {
+  if (ctx.hasPath('docs/specs')) return 'docs/specs';
+  if (ctx.providers.has('openspec') && ctx.hasPath('openspec/specs')) return 'openspec/specs';
+  return null;
+}
+
 export function adrIndexExists(ctx: ScanContext): boolean {
   const dir = adrDir(ctx);
   if (!dir) return false;

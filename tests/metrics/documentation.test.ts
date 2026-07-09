@@ -51,6 +51,21 @@ describe('documentation metrics', () => {
     expect(metric('documentation.docs-research-exists').check(fx.ctx)).toBe(true);
   });
 
+  it('docs/specs passes via plain docs/specs regardless of detected provider', () => {
+    fx = scanFixture({ 'docs/specs/spec1.md': 'x' }, ['none']);
+    expect(metric('documentation.docs-specs-exists').check(fx.ctx)).toBe(true);
+  });
+
+  it('docs/specs passes via openspec/specs when the openspec provider is detected', () => {
+    fx = scanFixture({ 'openspec/specs/foo/spec.md': 'x' }, ['openspec']);
+    expect(metric('documentation.docs-specs-exists').check(fx.ctx)).toBe(true);
+  });
+
+  it('docs/specs fails via openspec/specs when the openspec provider is not detected', () => {
+    fx = scanFixture({ 'openspec/specs/foo/spec.md': 'x' }, ['none']);
+    expect(metric('documentation.docs-specs-exists').check(fx.ctx)).toBe(false);
+  });
+
   it('docs/adr exists and ADR index exists', () => {
     fx = scanFixture({ 'docs/adr/README.md': 'index', 'docs/adr/0001-use-ts.md': 'x' });
     expect(metric('documentation.docs-adr-exists').check(fx.ctx)).toBe(true);

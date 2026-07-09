@@ -4,6 +4,7 @@ import {
   aiContextContent,
   claudeShimOrImportExists,
   mentionsAny,
+  specsDir,
 } from './helpers.js';
 
 export const aiContextMetrics: Metric[] = [
@@ -77,7 +78,7 @@ export const aiContextMetrics: Metric[] = [
     remediation:
       'A docs/specs/ directory gives agents a place to find current feature and requirement specifications. Create the directory and start adding specs as you build features.',
     points: 10,
-    check: (ctx) => ctx.hasPath('docs/specs'),
+    check: (ctx) => specsDir(ctx) !== null,
   },
   {
     id: 'ai-context.docs-plans-exists',

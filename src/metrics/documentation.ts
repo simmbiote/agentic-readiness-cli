@@ -1,5 +1,5 @@
 import type { Metric } from './types.js';
-import { adrDir, adrIndexExists, hasHeadingMatching, hasPrTemplate } from './helpers.js';
+import { adrDir, adrIndexExists, hasHeadingMatching, hasPrTemplate, specsDir } from './helpers.js';
 
 export const documentationMetrics: Metric[] = [
   {
@@ -48,7 +48,7 @@ export const documentationMetrics: Metric[] = [
     remediation:
       'A docs/specs/ directory gives agents a place to find current feature and requirement specifications. Create the directory and start adding specs as you build features.',
     points: 10,
-    check: (ctx) => ctx.hasPath('docs/specs'),
+    check: (ctx) => specsDir(ctx) !== null,
   },
   {
     id: 'documentation.docs-plans-exists',

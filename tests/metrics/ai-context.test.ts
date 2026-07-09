@@ -55,6 +55,21 @@ describe('AI context metrics', () => {
     expect(metric('ai-context.docs-research-exists').check(fx.ctx)).toBe(true);
   });
 
+  it('docs/specs passes via plain docs/specs regardless of detected provider', () => {
+    fx = scanFixture({ 'docs/specs/a.md': 'x' }, ['none']);
+    expect(metric('ai-context.docs-specs-exists').check(fx.ctx)).toBe(true);
+  });
+
+  it('docs/specs passes via openspec/specs when the openspec provider is detected', () => {
+    fx = scanFixture({ 'openspec/specs/foo/spec.md': 'x' }, ['openspec']);
+    expect(metric('ai-context.docs-specs-exists').check(fx.ctx)).toBe(true);
+  });
+
+  it('docs/specs fails via openspec/specs when the openspec provider is not detected', () => {
+    fx = scanFixture({ 'openspec/specs/foo/spec.md': 'x' }, ['none']);
+    expect(metric('ai-context.docs-specs-exists').check(fx.ctx)).toBe(false);
+  });
+
   it('.agentignore or equivalent exists', () => {
     fx = scanFixture({ '.agentignore': 'secrets/' });
     expect(metric('ai-context.agentignore-exists').check(fx.ctx)).toBe(true);

@@ -17,12 +17,16 @@ export interface CategoryScore {
   category: Category;
   earned: number;
   max: number;
+  percentage: number;
   metrics: MetricResult[];
 }
+
+export type TopImprovement = Pick<MetricResult, 'id' | 'category' | 'description' | 'points'>;
 
 export interface ScoringResult {
   providers: ProviderId[];
   categories: CategoryScore[];
+  topImprovements: TopImprovement[];
   overall: {
     earned: number;
     max: number;
@@ -76,16 +80,25 @@ export function scoreRepo(ctx: ScanContext, metrics: Metric[]): ScoringResult {
     });
     const earned = results.reduce((sum, r) => sum + r.earned, 0);
     const max = results.reduce((sum, r) => sum + r.points, 0);
-    return { category, earned, max, metrics: results };
+    const percentage = max === 0 ? 0 : (earned / max) * 100;
+    return { category, earned, max, percentage, metrics: results };
   });
 
   const overallEarned = categories.reduce((sum, c) => sum + c.earned, 0);
   const overallMax = categories.reduce((sum, c) => sum + c.max, 0);
   const percentage = overallMax === 0 ? 0 : (overallEarned / overallMax) * 100;
 
+  const topImprovements = categories
+    .flatMap((c) => c.metrics)
+    .filter((m) => !m.passed)
+    .sort((a, b) => b.points - a.points)
+    .slice(0, 5)
+    .map(({ id, category, description, points }) => ({ id, category, description, points }));
+
   return {
     providers: Array.from(ctx.providers),
     categories,
+    topImprovements,
     overall: {
       earned: overallEarned,
       max: overallMax,

@@ -8,7 +8,7 @@ Define the catalog of agentic-readiness metrics — grouped into six categories,
 
 ### Requirement: Metric Catalog Structure
 
-The system SHALL define a metrics catalog grouped into exactly six categories: Documentation, Architecture, Testing, Automation Guard Rails, AI Context, and Maintainability. Each metric in the catalog SHALL have a unique id, a category, a point value greater than zero, a human-readable description, an optional `provider` tag, and a detection rule that operates on a scanned repo file tree.
+The system SHALL define a metrics catalog grouped into exactly six categories: Documentation, Architecture, Testing, Automation Guard Rails, AI Context, and Maintainability. Each metric in the catalog SHALL have a unique id, a category, a point value greater than zero, a human-readable checklist-style description, an imperative instruction describing the concrete fix when the metric fails, a remediation explanation of what the check means and what is expected to satisfy it, an optional `provider` tag, and a detection rule that operates on a scanned repo file tree.
 
 #### Scenario: Catalog covers all six categories
 
@@ -19,6 +19,16 @@ The system SHALL define a metrics catalog grouped into exactly six categories: D
 
 - **WHEN** the metrics catalog is loaded
 - **THEN** no two metrics share the same id
+
+#### Scenario: Every metric has an instruction
+
+- **WHEN** the metrics catalog is loaded
+- **THEN** every metric has a non-empty `instruction` string distinct from its `description`
+
+#### Scenario: Every metric has a remediation explanation
+
+- **WHEN** the metrics catalog is loaded
+- **THEN** every metric has a non-empty `remediation` string distinct from its `description` and `instruction`
 
 ### Requirement: Provider-Scoped Metrics
 
@@ -46,7 +56,7 @@ A metric MAY carry a `provider` tag with value `openspec`, `claude`, or `univers
 
 ### Requirement: Documentation Category Metrics
 
-The system SHALL measure whether repo knowledge is explicit and versioned, using the following metrics: README exists (10), README has setup/run/test sections (15), CONTRIBUTING.md exists (10), `docs/specs/` exists (10), `docs/plans/` exists (10), `docs/research/` exists (10), `docs/adr/` exists (10), ADR index exists (10), PR template exists (10), Spec/ADR templates exist (5).
+The system SHALL measure whether repo knowledge is explicit and versioned, using the following metrics: README exists (10), README has setup/run/test sections (15), CONTRIBUTING.md exists (10), `docs/specs/` exists (10), `docs/plans/` exists (10), `docs/research/` exists (10), `docs/adr/` exists (10), ADR index exists (10), PR template exists (10), Spec/ADR templates exist (5). The "`docs/specs/` exists" metric SHALL also pass when `openspec/specs/` exists and the repo's detected provider set includes `openspec`, even if `docs/specs/` does not exist.
 
 #### Scenario: README existence detected
 
@@ -72,6 +82,16 @@ The system SHALL measure whether repo knowledge is explicit and versioned, using
 
 - **WHEN** scanning a repo that contains a `docs/specs/` directory with at least one file inside
 - **THEN** the "docs/specs/ exists" metric is marked passed and awards 10 points
+
+#### Scenario: openspec/specs directory recognized in place of docs/specs (Documentation)
+
+- **WHEN** scanning a repo with the `openspec` provider detected, that contains an `openspec/specs/` directory but no `docs/specs/` directory
+- **THEN** the "docs/specs/ exists" metric is marked passed and awards 10 points
+
+#### Scenario: openspec/specs directory ignored without the openspec provider detected (Documentation)
+
+- **WHEN** scanning a repo without the `openspec` provider detected, that contains an `openspec/specs/` directory but no `docs/specs/` directory
+- **THEN** the "docs/specs/ exists" metric is marked failed and awards zero points
 
 #### Scenario: docs/plans directory detected (Documentation)
 
@@ -237,7 +257,7 @@ The system SHALL measure whether automated guardrails are in place, using the fo
 
 ### Requirement: AI Context Category Metrics
 
-The system SHALL measure whether Claude or other coding agents have explicit repo-level guidance, using the following metrics: AGENTS.md exists (20), CLAUDE.md shim/import exists (15), agent file covers testing (10), agent file covers code style (10), agent file covers architecture rules (10), agent file covers ADR/spec rules (10), `docs/specs` exists (10), `docs/plans` exists (5), `docs/research` exists (5), `.agentignore` or equivalent exists (5).
+The system SHALL measure whether Claude or other coding agents have explicit repo-level guidance, using the following metrics: AGENTS.md exists (20), CLAUDE.md shim/import exists (15), agent file covers testing (10), agent file covers code style (10), agent file covers architecture rules (10), agent file covers ADR/spec rules (10), `docs/specs` exists (10), `docs/plans` exists (5), `docs/research` exists (5), `.agentignore` or equivalent exists (5). The "`docs/specs` exists" metric SHALL also pass when `openspec/specs/` exists and the repo's detected provider set includes `openspec`, even if `docs/specs/` does not exist.
 
 #### Scenario: AGENTS.md existence detected
 
@@ -272,6 +292,11 @@ The system SHALL measure whether Claude or other coding agents have explicit rep
 #### Scenario: docs/specs directory detected (AI Context)
 
 - **WHEN** scanning a repo that contains a `docs/specs/` directory with at least one file inside
+- **THEN** the "docs/specs exists" metric is marked passed and awards 10 points
+
+#### Scenario: openspec/specs directory recognized in place of docs/specs (AI Context)
+
+- **WHEN** scanning a repo with the `openspec` provider detected, that contains an `openspec/specs/` directory but no `docs/specs/` directory
 - **THEN** the "docs/specs exists" metric is marked passed and awards 10 points
 
 #### Scenario: docs/plans directory detected (AI Context)

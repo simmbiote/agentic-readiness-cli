@@ -28,27 +28,10 @@ export interface RenderReportOptions {
   detailed?: boolean;
 }
 
+const DIVIDER = '─'.repeat(40);
+
 export function renderReport(result: ScoringResult, options: RenderReportOptions = {}): string {
   const lines: string[] = [];
-
-  const { earned, max, percentage, grade } = result.overall;
-  const color = percentageColor(percentage);
-  lines.push(
-    `Overall: ${color(`${earned}/${max}`)} (${color(`${percentage.toFixed(1)}%`)}) — Grade: ${gradeColor(grade)(grade)}`,
-  );
-  lines.push('');
-
-  if (result.topImprovements.length > 0) {
-    lines.push(pc.bold('Top Improvements:'));
-    for (const improvement of result.topImprovements) {
-      lines.push(
-        pc.red(
-          `  - ${improvement.instruction} [${CATEGORY_LABELS[improvement.category]}] (+${improvement.points} pts)`,
-        ),
-      );
-    }
-    lines.push('');
-  }
 
   if (result.providers.length === 1 && result.providers[0] === 'none') {
     lines.push('Detected providers: none');
@@ -80,5 +63,26 @@ export function renderReport(result: ScoringResult, options: RenderReportOptions
     lines.push('');
   }
 
-  return lines.join('\n').trimEnd();
+  lines.push(pc.dim(DIVIDER));
+  lines.push('');
+
+  const { earned, max, percentage, grade } = result.overall;
+  const color = percentageColor(percentage);
+  lines.push(
+    `Overall: ${color(`${earned}/${max}`)} (${color(`${percentage.toFixed(1)}%`)}) — Grade: ${gradeColor(grade)(grade)}`,
+  );
+  lines.push('');
+
+  if (result.topImprovements.length > 0) {
+    lines.push(pc.bold('Top Improvements:'));
+    for (const improvement of result.topImprovements) {
+      lines.push(
+        pc.red(
+          `  - ${improvement.instruction} [${CATEGORY_LABELS[improvement.category]}] (+${improvement.points} pts)`,
+        ),
+      );
+    }
+  }
+  lines.push('\n');
+  return lines.join('\n')
 }

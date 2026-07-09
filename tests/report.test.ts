@@ -44,18 +44,26 @@ function buildResult(overrides: Partial<ScoringResult> = {}): ScoringResult {
 }
 
 describe('renderReport', () => {
-  it('orders sections as: overall, top improvements, providers, categories', () => {
+  it('orders sections as: providers, categories, divider, overall, top improvements', () => {
     const output = renderReport(buildResult());
 
-    const overallIdx = output.indexOf('Overall:');
-    const topIdx = output.indexOf('Top Improvements:');
     const providersIdx = output.indexOf('Detected providers:');
     const categoryIdx = output.indexOf('Documentation:');
+    const dividerIdx = output.indexOf('─'.repeat(40));
+    const overallIdx = output.indexOf('Overall:');
+    const topIdx = output.indexOf('Top Improvements:');
 
-    expect(overallIdx).toBeGreaterThanOrEqual(0);
-    expect(overallIdx).toBeLessThan(topIdx);
-    expect(topIdx).toBeLessThan(providersIdx);
+    expect(providersIdx).toBeGreaterThanOrEqual(0);
     expect(providersIdx).toBeLessThan(categoryIdx);
+    expect(categoryIdx).toBeLessThan(dividerIdx);
+    expect(dividerIdx).toBeLessThan(overallIdx);
+    expect(overallIdx).toBeLessThan(topIdx);
+  });
+
+  it('includes a divider between the category breakdown and the overall line', () => {
+    const output = renderReport(buildResult());
+
+    expect(output).toContain('─'.repeat(40));
   });
 
   it('lists top improvements with instruction, category, and points', () => {
@@ -64,13 +72,11 @@ describe('renderReport', () => {
     expect(output).toContain('Add a CONTRIBUTING.md file [Documentation] (+25 pts)');
   });
 
-  it('omits the Top Improvements section when the list is empty', () => {
+  it('omits the Top Improvements section when the list is empty, leaving overall as the last content', () => {
     const output = renderReport(buildResult({ topImprovements: [] }));
 
     expect(output).not.toContain('Top Improvements:');
-    const overallIdx = output.indexOf('Overall:');
-    const providersIdx = output.indexOf('Detected providers:');
-    expect(overallIdx).toBeLessThan(providersIdx);
+    expect(output.trimEnd().endsWith('Grade: F')).toBe(true);
   });
 
   it('shows category percentage alongside earned/max score', () => {

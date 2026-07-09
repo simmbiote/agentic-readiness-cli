@@ -26,11 +26,26 @@ npx agentlint scan [path]             # human-readable report, defaults to the c
 npx agentlint scan [path] --json      # structured JSON output
 npx agentlint scan [path] --summary   # condensed report: overall, top improvements, providers, category totals — no per-metric detail
 npx agentlint scan [path] --detailed  # expanded report: each failing metric is followed by a remediation explanation
+npx agentlint scan [path] --html      # renders a self-contained HTML report and opens it in your browser
 ```
 
-`--summary` can be combined with `--json` to trim the JSON output the same way: each entry in `categories` omits its `metrics` array.
+The human-readable report prints, top to bottom: detected providers, the category/metric breakdown, a divider, then the overall score/grade and Top Improvements — the summary comes last so it's still on screen after a long breakdown, without scrolling.
 
-`--detailed` can be combined with `--json` to add a `remediation` field to each metric result; without `--detailed`, JSON metric results have no `remediation` field. `--detailed` has no effect when `--summary` is also set, since `--summary` already omits per-metric output entirely.
+`--summary` can be combined with `--json` or `--html` to trim per-metric detail the same way: each category omits its individual metric rows/`metrics` array.
+
+`--detailed` can be combined with `--json` or `--html` to include each failing metric's remediation text (a `remediation` field in JSON; an indented explanation in the text/HTML report). Without `--detailed`, JSON metric results have no `remediation` field. `--detailed` has no effect when `--summary` is also set, since `--summary` already omits per-metric output entirely.
+
+### `--html` and `--output`
+
+```bash
+npx agentlint scan [path] --html                        # writes a temp HTML file and opens it in your default browser
+npx agentlint scan [path] --html --output report.html   # writes the HTML report to the given path instead
+npx agentlint scan [path] --json --output report.json   # writes the JSON report to the given path instead of stdout
+```
+
+`--html` renders the scan as a self-contained HTML document (inline styles, no external assets) — handy for sharing or printing as a PDF via your browser's print dialog. Its section order is Overall → Top Improvements → providers → categories (unlike the terminal report, an HTML/PDF document has no scrollback problem, so the summary stays at the top).
+
+`--output <path>` redirects `--html` or `--json` output to a file (creating any missing parent directories) instead of opening a browser or printing to stdout, and prints a confirmation naming the file. If both `--html` and `--json` are passed, `--html` takes precedence and `--output` writes the HTML. `--output` has no effect unless `--html` or `--json` is also passed.
 
 During development, run directly against source without building:
 

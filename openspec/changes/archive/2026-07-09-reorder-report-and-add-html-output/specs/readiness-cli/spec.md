@@ -1,43 +1,4 @@
-# readiness-cli Specification
-
-## Purpose
-
-Provide the command-line interface for scanning a repository, driving the full metric catalog against it, and reporting the resulting readiness score either as a human-readable report or as structured JSON.
-
-## Requirements
-
-### Requirement: Scan Target Repo Path
-
-The system SHALL require an explicit `scan` subcommand as the first command-line argument, followed optionally by a local filesystem path to a repository, and SHALL run the full metric catalog against that path. If no path is given after `scan`, it SHALL default to the current working directory. If the CLI is invoked without the `scan` subcommand as the first argument, it SHALL exit with a non-zero status and print a usage error naming `scan` as the required subcommand, without attempting to score.
-
-#### Scenario: Explicit path scanned
-
-- **WHEN** the CLI is invoked as `scan <path>` with `<path>` pointing to a valid directory
-- **THEN** the scanner walks that directory and evaluates all metrics against it
-
-#### Scenario: Default to current directory
-
-- **WHEN** the CLI is invoked as `scan` with no path argument
-- **THEN** the scanner walks the current working directory
-
-#### Scenario: Invalid path rejected
-
-- **WHEN** the CLI is invoked as `scan <path>` where `<path>` does not exist or is not a directory
-- **THEN** the CLI exits with a non-zero status and prints an error message, without attempting to score
-
-#### Scenario: Missing scan subcommand rejected
-
-- **WHEN** the CLI is invoked without `scan` as the first argument (e.g. a bare path, a flag, or no arguments at all)
-- **THEN** the CLI exits with a non-zero status and prints a usage error naming `scan` as the required subcommand, without attempting to score
-
-### Requirement: Excluded Directories
-
-The system SHALL exclude common vendored/generated directories (at minimum `node_modules`, `.git`, `dist`, `build`) from the filesystem walk used for metric detection.
-
-#### Scenario: Vendored directory contents ignored
-
-- **WHEN** a repo contains a `node_modules/` directory with files that would otherwise match a metric's detection rule
-- **THEN** those files are not considered when evaluating metrics
+## MODIFIED Requirements
 
 ### Requirement: Human-Readable Report Output
 
@@ -164,6 +125,8 @@ The system SHALL exit with status code 0 after successfully producing and, if re
 
 - **WHEN** the CLI is invoked with `--output <path>` (with either `--html` or `--json`) and `<path>` cannot be written (e.g. permission denied)
 - **THEN** the CLI exits with a non-zero status and prints an error message
+
+## ADDED Requirements
 
 ### Requirement: HTML Report Output
 

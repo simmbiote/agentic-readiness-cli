@@ -1,13 +1,25 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
+import { readFileSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { main } from '../src/cli.js';
 import { createFixture, type Fixture } from './helpers/fixture.js';
 
+vi.mock('node:child_process', () => ({
+  spawn: vi.fn(() => ({ unref: vi.fn() })),
+}));
+
 describe('CLI', () => {
   let fixture: Fixture | undefined;
+  let outDir: string | undefined;
 
   afterEach(() => {
     fixture?.cleanup();
     fixture = undefined;
+    if (outDir) {
+      rmSync(outDir, { recursive: true, force: true });
+      outDir = undefined;
+    }
     vi.restoreAllMocks();
   });
 
@@ -124,6 +136,135 @@ describe('CLI', () => {
     const exitCode = main(['scan', fixture.root]);
 
     expect(exitCode).toBe(0);
+  });
+
+  it('writes an HTML report to a temp file and attempts to open it when --html is used without --output', async () => {
+    fixture = createFixture({ 'README.md': '# hi' });
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const { spawn } = await import('node:child_process');
+
+    const exitCode = main(['scan', fixture.root, '--html']);
+
+    expect(exitCode).toBe(0);
+    expect(spawn).toHaveBeenCalled();
+    const logged = logSpy.mock.calls.map((call) => call[0]).join('\n');
+    expect(logged).toContain('Wrote HTML report to');
+    const tempPathMatch = logged.match(/Wrote HTML report to (\S+)/);
+    expect(tempPathMatch).not.toBeNull();
+    const tempPath = tempPathMatch![1];
+    expect(readFileSync(tempPath, 'utf8')).toContain('<!doctype html>');
+  });
+
+  it('writes an HTML report to the given --output path with a confirmation, without opening a browser', async () => {
+    fixture = createFixture({ 'README.md': '# hi' });
+    outDir = mkdtempSync(path.join(tmpdir(), 'agentlint-out-'));
+    const outPath = path.join(outDir, 'report.html');
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const { spawn } = await import('node:child_process');
+
+    const exitCode = main(['scan', fixture.root, '--html', '--output', outPath]);
+
+    expect(exitCode).toBe(0);
+    expect(spawn).not.toHaveBeenCalled();
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining(outPath));
+    expect(readFileSync(outPath, 'utf8')).toContain('<!doctype html>');
+  });
+
+  it('creates missing parent directories for --html --output', () => {
+    fixture = createFixture({ 'README.md': '# hi' });
+    outDir = mkdtempSync(path.join(tmpdir(), 'agentlint-out-'));
+    const outPath = path.join(outDir, 'nested', 'deep', 'report.html');
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const exitCode = main(['scan', fixture.root, '--html', '--output', outPath]);
+
+    expect(exitCode).toBe(0);
+    expect(readFileSync(outPath, 'utf8')).toContain('<!doctype html>');
+  });
+
+  it('prefers --html over --json when both are passed, and --output writes the HTML', () => {
+    fixture = createFixture({ 'README.md': '# hi' });
+    outDir = mkdtempSync(path.join(tmpdir(), 'agentlint-out-'));
+    const outPath = path.join(outDir, 'report.html');
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const exitCode = main(['scan', fixture.root, '--html', '--json', '--output', outPath]);
+
+    expect(exitCode).toBe(0);
+    expect(readFileSync(outPath, 'utf8')).toContain('<!doctype html>');
+  });
+
+  it('writes JSON to the given --output path with a confirmation, printing nothing else', () => {
+    fixture = createFixture({ 'README.md': '# hi' });
+    outDir = mkdtempSync(path.join(tmpdir(), 'agentlint-out-'));
+    const outPath = path.join(outDir, 'report.json');
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const exitCode = main(['scan', fixture.root, '--json', '--output', outPath]);
+
+    expect(exitCode).toBe(0);
+    expect(logSpy).toHaveBeenCalledOnce();
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining(outPath));
+    const parsed = JSON.parse(readFileSync(outPath, 'utf8'));
+    expect(parsed.overall.grade).toBeDefined();
+    expect(Array.isArray(parsed.categories)).toBe(true);
+  });
+
+  it('creates missing parent directories for --json --output', () => {
+    fixture = createFixture({ 'README.md': '# hi' });
+    outDir = mkdtempSync(path.join(tmpdir(), 'agentlint-out-'));
+    const outPath = path.join(outDir, 'nested', 'deep', 'report.json');
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const exitCode = main(['scan', fixture.root, '--json', '--output', outPath]);
+
+    expect(exitCode).toBe(0);
+    expect(() => JSON.parse(readFileSync(outPath, 'utf8'))).not.toThrow();
+  });
+
+  it('ignores --output when neither --html nor --json is passed', () => {
+    fixture = createFixture({ 'README.md': '# hi' });
+    outDir = mkdtempSync(path.join(tmpdir(), 'agentlint-out-'));
+    const outPath = path.join(outDir, 'report.txt');
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const exitCodeWithOutput = main(['scan', fixture.root, '--output', outPath]);
+    const outputWithFlag = logSpy.mock.calls[0][0] as string;
+    logSpy.mockClear();
+    const exitCodeWithoutOutput = main(['scan', fixture.root]);
+    const outputWithoutFlag = logSpy.mock.calls[0][0] as string;
+
+    expect(exitCodeWithOutput).toBe(0);
+    expect(exitCodeWithoutOutput).toBe(0);
+    expect(outputWithFlag).toBe(outputWithoutFlag);
+  });
+
+  it('exits non-zero when --html --output cannot be written', () => {
+    fixture = createFixture({ 'README.md': '# hi' });
+    outDir = mkdtempSync(path.join(tmpdir(), 'agentlint-out-'));
+    const blockingFile = path.join(outDir, 'not-a-directory');
+    writeFileSync(blockingFile, 'x');
+    const outPath = path.join(blockingFile, 'report.html');
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const exitCode = main(['scan', fixture.root, '--html', '--output', outPath]);
+
+    expect(exitCode).toBe(1);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('failed to write'));
+  });
+
+  it('exits non-zero when --json --output cannot be written', () => {
+    fixture = createFixture({ 'README.md': '# hi' });
+    outDir = mkdtempSync(path.join(tmpdir(), 'agentlint-out-'));
+    const blockingFile = path.join(outDir, 'not-a-directory');
+    writeFileSync(blockingFile, 'x');
+    const outPath = path.join(blockingFile, 'report.json');
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const exitCode = main(['scan', fixture.root, '--json', '--output', outPath]);
+
+    expect(exitCode).toBe(1);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('failed to write'));
   });
 
   it('excludes node_modules content from scoring signals', () => {

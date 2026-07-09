@@ -30,9 +30,11 @@ npx agentlint scan [path] --html      # renders a self-contained HTML report and
 ```
 
 A simple scan 
+
 https://github.com/user-attachments/assets/a92951e2-ced9-48d2-9b7b-2b65643dc9f6 
 
-Detailed HTML report 
+Detailed HTML report  
+
 https://github.com/user-attachments/assets/81d58ff2-f674-4ec5-b5e0-193ec3cae5d0 
 
 

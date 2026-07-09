@@ -4,11 +4,12 @@
 - [ ] 1.2 Add lint/format tooling (e.g., ESLint + Prettier) and a test runner (e.g., Vitest)
 - [ ] 1.3 Add a basic `README.md` and `.gitignore`, and initialize the git repo
 
-## 2. File Walker
+## 2. File Walker & Git Log Adapter
 
 - [ ] 2.1 Implement a repo file-tree walker that recursively lists files/dirs under a given root
 - [ ] 2.2 Exclude `node_modules`, `.git`, `dist`, `build` (and similar) directories from the walk
-- [ ] 2.3 Add unit tests for the walker, including exclusion behavior
+- [ ] 2.3 Implement a git-log adapter: recent commit subjects (for conventional-commit checks) and last-commit timestamp for a given path (for docs-freshness checks)
+- [ ] 2.4 Add unit tests for the walker (including exclusion behavior) and the git-log adapter (against a fixture repo with controlled commit history)
 
 ## 3. Provider Detection (provider-detection)
 
@@ -22,16 +23,16 @@
 ## 4. Metrics Catalog (readiness-metrics)
 
 - [ ] 4.1 Define the metric data shape (`id`, `category`, `description`, `points`, `provider?`, `check`)
-- [ ] 4.2 Implement Documentation metrics: README exists, README setup/run/test sections, CONTRIBUTING.md exists
-- [ ] 4.3 Implement Architecture metrics: architecture docs exist, ADR/decisions directory exists
-- [ ] 4.4 Implement Testing metrics: test suite exists, CI runs tests
-- [ ] 4.5 Implement Automation Guard Rails metrics: CI pipeline configured, lint enforced in CI
-- [ ] 4.6 Implement AI Context metrics: CLAUDE.md/AGENTS.md exists, AI context shim/import detected
-- [ ] 4.7 Implement Maintainability metrics: CODEOWNERS exists, PR template exists
+- [ ] 4.2 Implement Documentation metrics (10): README exists, README setup/run/test sections, CONTRIBUTING.md exists, `docs/specs/`, `docs/plans/`, `docs/research/`, `docs/adr/`, ADR index, PR template, spec/ADR templates
+- [ ] 4.3 Implement Architecture metrics (8): `docs/adr/` exists, ADR files exist, ADR index, architecture overview doc, CODEOWNERS, clear source root, module/package boundaries detectable, no very large source files (800-line default threshold)
+- [ ] 4.4 Implement Testing metrics (7): test command detected (via manifest/build-file inference), test command documented, CI runs tests, test files exist, coverage config/report, unit/integration structure detectable, tests are required checks
+- [ ] 4.5 Implement Automation Guard Rails metrics (8): CI workflow exists, lint command detected, format command detected, typecheck/static analysis detected, security/dependency scan, PR template, conventional commit config, required checks/branch protection hint
+- [ ] 4.6 Implement AI Context metrics (10): AGENTS.md exists, CLAUDE.md shim/import, agent file covers testing/code style/architecture rules/ADR-spec rules, `docs/specs`, `docs/plans`, `docs/research`, `.agentignore` or equivalent
+- [ ] 4.7 Implement Maintainability metrics (9): PR template checklist, PR size guidance, conventional commits used recently (git-log adapter, 70%-of-last-20 default), large files below threshold, TODO/FIXME count reasonable (0.5% density default), dependency lockfile, CODEOWNERS, docs updated recently (git-log adapter, 90-day default), no generated files mixed with source
 - [ ] 4.8 Implement `provider: openspec` metrics: change design docs present (Architecture), `openspec validate` in CI (Automation Guard Rails), change archive used (Maintainability)
 - [ ] 4.9 Implement `provider: claude` metrics: hooks configured (Automation Guard Rails), subagents/skills documented (Maintainability), custom commands documented (Documentation)
 - [ ] 4.10 Implement `provider: universal` metric: `AGENTS.md` has Setup/Conventions/Testing sections (AI Context)
-- [ ] 4.11 Add unit tests for each metric's pass/fail detection using fixture repo trees, including provider-scoped metrics under each detected-provider combination
+- [ ] 4.11 Add unit tests for each metric's pass/fail detection using fixture repo trees, including provider-scoped metrics under each detected-provider combination and boundary cases for the heuristic thresholds (799 vs 801 lines, 69% vs 70% conventional-commit ratio, etc.)
 
 ## 5. Scoring Engine (readiness-scoring)
 

@@ -42,6 +42,12 @@
 8. **Provider-scoped metrics are cross-cutting and change the max score, not just the AI Context category.**
    A metric may carry an optional `provider` tag; untagged metrics always apply, tagged metrics only apply (count toward earned *and* max) when their provider is in the detected set. This means the overall max score is repo-specific rather than a fixed constant. Alternative — keep a fixed universal max and only vary earned score — rejected because it would unfairly penalize repos whose provider unlocks fewer bonus metrics, and would let provider-scoped metrics leak into categories where they don't apply as unearned "missing" points.
 
+9. **A small git-log reader sits alongside the filesystem walker.**
+   Most metrics only need the file tree, but a few (`conventional commits used recently`, `docs updated recently`) need commit history — recent commit subject lines and last-touched dates for specific paths. Rather than growing the walker to understand git, this change adds a narrow git-log adapter (`git log --oneline -20`, `git log -1 --format=%ct -- <path>`) that these specific checks call directly. Alternative — skip git-derived metrics for v1 — rejected because they were explicitly requested in the metrics list and are cheap to implement as a thin adapter.
+
+10. **Heuristic thresholds ship as fixed defaults, documented alongside the metric.**
+    Where the metric name implies a judgment call rather than a hard existence check, v1 uses one fixed default per metric rather than leaving it undefined: large-file flag at 800 lines (`no very large source files`, `large files below threshold`); docs freshness at 90 days since last commit touching `docs/` or the README (`docs updated recently`); conventional-commit adoption at ≥70% of the last 20 commits (`conventional commits used recently`); TODO/FIXME density at <0.5% of source lines (`TODO/FIXME count reasonable`). These defaults live next to their metric definitions in the catalog (not scattered through scoring/CLI code) so they can be tuned later without a structural change.
+
 ## Risks / Trade-offs
 
 - **Existence checks miss content quality** (e.g., README exists but is empty) → Mitigation: metrics that matter most (README, CLAUDE.md/AGENTS.md) check for required section headers or minimum content, not just file presence.

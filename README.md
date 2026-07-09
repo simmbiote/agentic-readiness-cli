@@ -29,6 +29,13 @@ npx agentlint scan [path] --detailed  # expanded report: each failing metric is 
 npx agentlint scan [path] --html      # renders a self-contained HTML report and opens it in your browser
 ```
 
+A simple scan 
+https://github.com/user-attachments/assets/a92951e2-ced9-48d2-9b7b-2b65643dc9f6 
+
+Detailed HTML report 
+https://github.com/user-attachments/assets/81d58ff2-f674-4ec5-b5e0-193ec3cae5d0 
+
+
 The human-readable report prints, top to bottom: detected providers, the category/metric breakdown, a divider, then the overall score/grade and Top Improvements — the summary comes last so it's still on screen after a long breakdown, without scrolling.
 
 `--summary` can be combined with `--json` or `--html` to trim per-metric detail the same way: each category omits its individual metric rows/`metrics` array.

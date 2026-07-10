@@ -62,17 +62,13 @@ During development, run directly against source without building:
 npm run dev -- scan [path]
 ```
 
-> **Known issue:** `npx agenticgrade scan [path]` currently exits silently with no output.
-> `dist/cli.js`'s main-module check (`import.meta.url === new URL(process.argv[1], 'file:').href`)
-> fails when the CLI is invoked through the `node_modules/.bin/agenticgrade` symlink that `npx`
-> uses, because `import.meta.url` resolves through the symlink to a different path than
-> `process.argv[1]`. Until that's fixed, run the built CLI directly instead:
->
-> ```bash
-> npm run build
-> node dist/cli.js scan [path]        # e.g. node dist/cli.js scan . to score this repo
-> node dist/cli.js scan [path] --json
-> ```
+Run from the build:  
+
+```bash
+npm run build
+node dist/cli.js scan [path]        # e.g. node dist/cli.js scan . to score this repo
+node dist/cli.js scan [path] --json
+```
 
 ## Test
 

@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-import { existsSync, statSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, statSync, mkdirSync, writeFileSync, realpathSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { runScan } from './index.js';
 import { renderReport } from './report.js';
 import { renderHtmlReport } from './html-report.js';
@@ -133,7 +134,16 @@ export function main(argv: string[]): number {
   return 0;
 }
 
-const isMainModule = process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').href;
-if (isMainModule) {
+function isMainModule(): boolean {
+  if (!process.argv[1]) return false;
+  if (import.meta.url === new URL(process.argv[1], 'file:').href) return true;
+  try {
+    return realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
+  } catch {
+    return false;
+  }
+}
+
+if (isMainModule()) {
   process.exit(main(process.argv.slice(2)));
 }

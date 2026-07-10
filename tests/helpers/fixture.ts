@@ -9,7 +9,7 @@ export interface Fixture {
 
 /** Materializes a `{ relPath: content }` map into a real temp directory tree. */
 export function createFixture(files: Record<string, string>): Fixture {
-  const root = mkdtempSync(path.join(tmpdir(), 'agentlint-'));
+  const root = mkdtempSync(path.join(tmpdir(), 'agenticgrade-'));
 
   for (const [relPath, content] of Object.entries(files)) {
     const abs = path.join(root, relPath);

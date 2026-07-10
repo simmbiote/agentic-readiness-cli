@@ -1,10 +1,10 @@
 {
-  "name": "agentlint",
+  "name": "agenticgrade",
   "version": "0.1.0",
   "description": "Scans a repo and scores its agentic-coding readiness across Documentation, Architecture, Testing, Automation Guard Rails, AI Context, and Maintainability.",
   "type": "module",
   "bin": {
-    "agentlint": "./dist/cli.js"
+    "agenticgrade": "./dist/cli.js"
   },
   "main": "./dist/index.js",
   "files": [

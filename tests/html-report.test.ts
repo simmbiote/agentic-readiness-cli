@@ -100,4 +100,16 @@ describe('renderHtmlReport', () => {
 
     expect(html).not.toContain('Top Improvements');
   });
+
+  it('includes a link to the repo for remediation details', () => {
+    const html = renderHtmlReport(buildResult());
+
+    expect(html).toContain('<a href="https://github.com/simmbiote/agenticgrade">');
+  });
+
+  it('titles the report with the current package name', () => {
+    const html = renderHtmlReport(buildResult());
+
+    expect(html).toContain('<title>agenticgrade report</title>');
+  });
 });

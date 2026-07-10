@@ -40,6 +40,13 @@ describe('CLI', () => {
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('scan'));
   });
 
+  it('names the current binary in the missing-subcommand usage error', () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    expect(main([])).toBe(1);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('agenticgrade scan'));
+  });
+
   it('defaults to the current working directory when no path is given', () => {
     fixture = createFixture({ 'README.md': '# hi' });
     const cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue(fixture.root);
@@ -157,7 +164,7 @@ describe('CLI', () => {
 
   it('writes an HTML report to the given --output path with a confirmation, without opening a browser', async () => {
     fixture = createFixture({ 'README.md': '# hi' });
-    outDir = mkdtempSync(path.join(tmpdir(), 'agentlint-out-'));
+    outDir = mkdtempSync(path.join(tmpdir(), 'agenticgrade-out-'));
     const outPath = path.join(outDir, 'report.html');
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     const { spawn } = await import('node:child_process');
@@ -172,7 +179,7 @@ describe('CLI', () => {
 
   it('creates missing parent directories for --html --output', () => {
     fixture = createFixture({ 'README.md': '# hi' });
-    outDir = mkdtempSync(path.join(tmpdir(), 'agentlint-out-'));
+    outDir = mkdtempSync(path.join(tmpdir(), 'agenticgrade-out-'));
     const outPath = path.join(outDir, 'nested', 'deep', 'report.html');
     vi.spyOn(console, 'log').mockImplementation(() => {});
 
@@ -184,7 +191,7 @@ describe('CLI', () => {
 
   it('prefers --html over --json when both are passed, and --output writes the HTML', () => {
     fixture = createFixture({ 'README.md': '# hi' });
-    outDir = mkdtempSync(path.join(tmpdir(), 'agentlint-out-'));
+    outDir = mkdtempSync(path.join(tmpdir(), 'agenticgrade-out-'));
     const outPath = path.join(outDir, 'report.html');
     vi.spyOn(console, 'log').mockImplementation(() => {});
 
@@ -196,7 +203,7 @@ describe('CLI', () => {
 
   it('writes JSON to the given --output path with a confirmation, printing nothing else', () => {
     fixture = createFixture({ 'README.md': '# hi' });
-    outDir = mkdtempSync(path.join(tmpdir(), 'agentlint-out-'));
+    outDir = mkdtempSync(path.join(tmpdir(), 'agenticgrade-out-'));
     const outPath = path.join(outDir, 'report.json');
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
@@ -212,7 +219,7 @@ describe('CLI', () => {
 
   it('creates missing parent directories for --json --output', () => {
     fixture = createFixture({ 'README.md': '# hi' });
-    outDir = mkdtempSync(path.join(tmpdir(), 'agentlint-out-'));
+    outDir = mkdtempSync(path.join(tmpdir(), 'agenticgrade-out-'));
     const outPath = path.join(outDir, 'nested', 'deep', 'report.json');
     vi.spyOn(console, 'log').mockImplementation(() => {});
 
@@ -224,7 +231,7 @@ describe('CLI', () => {
 
   it('ignores --output when neither --html nor --json is passed', () => {
     fixture = createFixture({ 'README.md': '# hi' });
-    outDir = mkdtempSync(path.join(tmpdir(), 'agentlint-out-'));
+    outDir = mkdtempSync(path.join(tmpdir(), 'agenticgrade-out-'));
     const outPath = path.join(outDir, 'report.txt');
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
@@ -241,7 +248,7 @@ describe('CLI', () => {
 
   it('exits non-zero when --html --output cannot be written', () => {
     fixture = createFixture({ 'README.md': '# hi' });
-    outDir = mkdtempSync(path.join(tmpdir(), 'agentlint-out-'));
+    outDir = mkdtempSync(path.join(tmpdir(), 'agenticgrade-out-'));
     const blockingFile = path.join(outDir, 'not-a-directory');
     writeFileSync(blockingFile, 'x');
     const outPath = path.join(blockingFile, 'report.html');
@@ -255,7 +262,7 @@ describe('CLI', () => {
 
   it('exits non-zero when --json --output cannot be written', () => {
     fixture = createFixture({ 'README.md': '# hi' });
-    outDir = mkdtempSync(path.join(tmpdir(), 'agentlint-out-'));
+    outDir = mkdtempSync(path.join(tmpdir(), 'agenticgrade-out-'));
     const blockingFile = path.join(outDir, 'not-a-directory');
     writeFileSync(blockingFile, 'x');
     const outPath = path.join(blockingFile, 'report.json');

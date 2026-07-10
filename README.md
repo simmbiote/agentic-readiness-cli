@@ -1,4 +1,4 @@
-# agentlint
+# agenticgrade
 
 Scans a repository and scores its agentic-coding readiness — whether the repo has
 what an AI coding agent needs to work well unaided — across six categories:
@@ -22,11 +22,11 @@ npm run build
 ## Run
 
 ```bash
-npx agentlint scan [path]             # human-readable report, defaults to the current directory
-npx agentlint scan [path] --json      # structured JSON output
-npx agentlint scan [path] --summary   # condensed report: overall, top improvements, providers, category totals — no per-metric detail
-npx agentlint scan [path] --detailed  # expanded report: each failing metric is followed by a remediation explanation
-npx agentlint scan [path] --html      # renders a self-contained HTML report and opens it in your browser
+npx agenticgrade scan [path]             # human-readable report, defaults to the current directory
+npx agenticgrade scan [path] --json      # structured JSON output
+npx agenticgrade scan [path] --summary   # condensed report: overall, top improvements, providers, category totals — no per-metric detail
+npx agenticgrade scan [path] --detailed  # expanded report: each failing metric is followed by a remediation explanation
+npx agenticgrade scan [path] --html      # renders a self-contained HTML report and opens it in your browser
 ```
 
 A simple scan 
@@ -47,9 +47,9 @@ The human-readable report prints, top to bottom: detected providers, the categor
 ### `--html` and `--output`
 
 ```bash
-npx agentlint scan [path] --html                        # writes a temp HTML file and opens it in your default browser
-npx agentlint scan [path] --html --output report.html   # writes the HTML report to the given path instead
-npx agentlint scan [path] --json --output report.json   # writes the JSON report to the given path instead of stdout
+npx agenticgrade scan [path] --html                        # writes a temp HTML file and opens it in your default browser
+npx agenticgrade scan [path] --html --output report.html   # writes the HTML report to the given path instead
+npx agenticgrade scan [path] --json --output report.json   # writes the JSON report to the given path instead of stdout
 ```
 
 `--html` renders the scan as a self-contained HTML document (inline styles, no external assets) — handy for sharing or printing as a PDF via your browser's print dialog. Its section order is Overall → Top Improvements → providers → categories (unlike the terminal report, an HTML/PDF document has no scrollback problem, so the summary stays at the top).
@@ -62,9 +62,9 @@ During development, run directly against source without building:
 npm run dev -- scan [path]
 ```
 
-> **Known issue:** `npx agentlint scan [path]` currently exits silently with no output.
+> **Known issue:** `npx agenticgrade scan [path]` currently exits silently with no output.
 > `dist/cli.js`'s main-module check (`import.meta.url === new URL(process.argv[1], 'file:').href`)
-> fails when the CLI is invoked through the `node_modules/.bin/agentlint` symlink that `npx`
+> fails when the CLI is invoked through the `node_modules/.bin/agenticgrade` symlink that `npx`
 > uses, because `import.meta.url` resolves through the symlink to a different path than
 > `process.argv[1]`. Until that's fixed, run the built CLI directly instead:
 >

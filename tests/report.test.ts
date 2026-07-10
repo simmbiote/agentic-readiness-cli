@@ -72,11 +72,20 @@ describe('renderReport', () => {
     expect(output).toContain('Add a CONTRIBUTING.md file [Documentation] (+25 pts)');
   });
 
-  it('omits the Top Improvements section when the list is empty, leaving overall as the last content', () => {
+  it('omits the Top Improvements section when the list is empty, leaving the repo link as the last content', () => {
     const output = renderReport(buildResult({ topImprovements: [] }));
 
     expect(output).not.toContain('Top Improvements:');
-    expect(output.trimEnd().endsWith('Grade: F')).toBe(true);
+    expect(output.trimEnd()).toContain('https://github.com/simmbiote/agenticgrade');
+    expect(output.indexOf('Grade: F')).toBeLessThan(
+      output.indexOf('https://github.com/simmbiote/agenticgrade'),
+    );
+  });
+
+  it('includes a link to the repo for remediation details', () => {
+    const output = renderReport(buildResult());
+
+    expect(output).toContain('https://github.com/simmbiote/agenticgrade');
   });
 
   it('shows category percentage alongside earned/max score', () => {

@@ -29,6 +29,7 @@ export interface RenderReportOptions {
 }
 
 const DIVIDER = '─'.repeat(40);
+const REPO_URL = 'https://github.com/simmbiote/agenticgrade';
 
 export function renderReport(result: ScoringResult, options: RenderReportOptions = {}): string {
   const lines: string[] = [];
@@ -83,6 +84,8 @@ export function renderReport(result: ScoringResult, options: RenderReportOptions
       );
     }
   }
+  lines.push('');
+  lines.push(pc.dim(`See ${REPO_URL} for details on how to address these issues.`));
   lines.push('\n');
   return lines.join('\n')
 }

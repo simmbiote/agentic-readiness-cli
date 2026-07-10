@@ -78,7 +78,7 @@ function openInBrowser(filePath: string): void {
 export function main(argv: string[]): number {
   if (argv[0] !== 'scan') {
     console.error(
-      'Error: missing required "scan" subcommand. Usage: agentlint scan [path] [--json] [--summary] [--detailed] [--html] [--output <path>]',
+      'Error: missing required "scan" subcommand. Usage: agenticgrade scan [path] [--json] [--summary] [--detailed] [--html] [--output <path>]',
     );
     return 1;
   }
@@ -98,7 +98,7 @@ export function main(argv: string[]): number {
     if (output) {
       return writeOutputFile(output, htmlContent, 'HTML');
     }
-    const tempPath = path.join(os.tmpdir(), `agentlint-report-${Date.now()}.html`);
+    const tempPath = path.join(os.tmpdir(), `agenticgrade-report-${Date.now()}.html`);
     writeFileSync(tempPath, htmlContent);
     console.log(`Wrote HTML report to ${tempPath}`);
     openInBrowser(tempPath);

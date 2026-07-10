@@ -36,6 +36,8 @@ function gradeClass(grade: string): string {
   return 'pct-low';
 }
 
+const REPO_URL = 'https://github.com/simmbiote/agenticgrade';
+
 const STYLE = `
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
   h1 { font-size: 1.5rem; }
@@ -54,6 +56,7 @@ const STYLE = `
   ul.metrics li { padding: 0.15rem 0; }
   .remediation { display: block; margin-left: 1.5rem; color: #57606a; font-size: 0.9rem; }
   .provider-tag { color: #57606a; font-size: 0.85rem; }
+  .footer { color: #57606a; font-size: 0.85rem; margin-top: 1.5rem; }
   @media print { body { margin: 0; } }
 `;
 
@@ -113,7 +116,7 @@ ${category.metrics
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>agentlint report</title>
+<title>agenticgrade report</title>
 <style>${STYLE}</style>
 </head>
 <body>
@@ -121,6 +124,7 @@ ${category.metrics
 ${topImprovementsHtml}
 ${providersHtml}
 ${categoriesHtml}
+<p class="footer">See <a href="${REPO_URL}">${REPO_URL}</a> for details on how to address these issues.</p>
 </body>
 </html>
 `;
